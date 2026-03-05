@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBA English - Full Translation & Explanation</title>
+    <style>
+        :root { --primary: #2c3e50; --success: #27ae60; --hint: #f39c12; --bg: #f4f7f6; --blue: #3498db; --vi: #e67e22; }
+        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: var(--bg); overflow-x: hidden; }
+        .card { background: white; padding: 25px 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 95%; max-width: 650px; }
+        
+        .status-bar { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 12px; color: #7f8c8d; font-weight: bold; }
+        
+        /* CÂU ĐỀ: DỊCH TRỌN VẸN CẢ CÂU VÍ DỤ */
+        .hint-container { text-align: left; border-left: 5px solid var(--primary); padding-left: 15px; margin-bottom: 25px; background: #fff; }
+        .chinese-hint { font-size: 19px; color: var(--primary); font-weight: 600; display: block; line-height: 1.5; }
+        .vietnamese-hint { font-size: 16px; color: var(--vi); display: block; margin-top: 8px; font-weight: 500; line-height: 1.5; }
+        
+        .sentence-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: baseline; font-size: 24px; color: #444; margin-bottom: 20px; font-weight: 500; }
+        input { border: none; border-bottom: 3px solid #bdc3c7; font-size: 24px; width: 130px; text-align: center; outline: none; color: #2980b9; font-weight: bold; background: transparent; transition: all 0.2s; }
+        input.correct { color: var(--success) !important; border-bottom-color: var(--success) !important; }
+        
+        /* GIẢI THÍCH CHI TIẾT SONG NGỮ */
+        .explanation { margin-top: 15px; opacity: 0; transition: opacity 0.5s; background: #fff; padding: 15px; border-radius: 8px; display: none; text-align: left; border: 1px solid #e0e6ed; }
+        .explanation.show { opacity: 1; display: block; }
+        .exp-label { font-size: 11px; font-weight: bold; color: #95a5a6; text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #f0f0f0; padding-bottom: 2px; }
+        .col-box { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+        .col-item { background: #f0f7ff; color: #007aff; padding: 2px 8px; border-radius: 4px; font-size: 13px; font-weight: 500; border: 1px solid #d1e9ff; }
+        .vi-detail { color: var(--vi); font-size: 14px; margin-top: 5px; font-weight: 500; }
+
+        .timer-container { width: 100%; height: 4px; background: #eee; margin-top: 20px; border-radius: 5px; overflow: hidden; visibility: hidden; }
+        .timer-bar { width: 100%; height: 100%; background: var(--success); }
+
+        .mobile-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn { border: none; padding: 14px 5px; border-radius: 10px; color: white; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+        .btn:active { transform: scale(0.95); }
+        .btn-check { background-color: var(--success); grid-column: span 2; font-size: 15px; }
+        .btn-speak { background-color: var(--blue); }
+        .btn-prev { background-color: #95a5a6; }
+        .btn-hint { background-color: var(--hint); }
+        .btn-next { background-color: #34495e; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="status-bar">
+            <span id="progress">Day 1-30 | MBA English</span>
+            <span style="color:var(--success)">📢 Auto Pronounce ON</span>
+        </div>
+
+        <div class="hint-container">
+            <span class="chinese-hint" id="cn-hint">点击屏幕开始练习</span>
+            <span class="vietnamese-hint" id="vi-hint">Nhấn vào để bắt đầu học</span>
+        </div>
+        
+        <div class="sentence-row">
+            <span id="prefix"></span>
+            <input type="text" id="ansInput" autocomplete="off" placeholder="____">
+            <span id="suffix"></span>
+        </div>
+
+        <div id="expBox" class="explanation">
+            <div style="margin-bottom: 12px;">
+                <span class="exp-label">词义解析 | Giải nghĩa từ</span>
+                <div id="expWordCn" style="color: var(--primary); font-weight: bold; font-size: 16px;"></div>
+                <div id="expWordVi" class="vi-detail"></div>
+            </div>
+            
+            <div>
+                <span class="exp-label">常用搭配 | Cụm từ đi kèm</span>
+                <div class="col-box" id="expCol"></div>
+            </div>
+        </div>
+
+        <div id="timerContainer" class="timer-container">
+            <div id="timerBar" class="timer-bar"></div>
+        </div>
+
+        <div class="mobile-controls">
+            <button class="btn btn-check" onclick="handleCheck()">✔️ KIỂM TRA / TIẾP TỤC</button>
+            <button class="btn btn-speak" onclick="handleSpeak()">🔊 NGHE CẢ CÂU</button>
+            <button class="btn btn-prev" onclick="handlePrev()">⬅️ TRƯỚC</button>
+            <button class="btn btn-hint" onclick="handleHint()">💡 GỢI Ý</button>
+            <button class="btn btn-next" onclick="handleNext()">➡️ TIẾP</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { 
+                ans: "ability", 
+                pre: "He has the", 
+                suf: "to do this job.", 
+                cn_sent: "他有能力胜任这份工作。", 
+                vi_sent: "Anh ấy có năng lực để hoàn thành công việc này.", 
+                word_cn: "ability: 能力，才干",
+                word_vi: "Năng lực, khả năng thực hiện một việc cụ thể.",
+                col: ["have the ability to", "academic ability", "managerial ability"]
+            },
+            { 
+                ans: "abroad", 
+                pre: "We should study", 
+                suf: ".", 
+                cn_sent: "我们应该出国留学。", 
+                vi_sent: "Chúng ta nên đi du học nước ngoài.", 
+                word_cn: "abroad: 在国外，到海外",
+                word_vi: "Ở nước ngoài. Lưu ý là trạng từ, không dùng giới từ 'to'.",
+                col: ["go abroad", "study abroad", "travel abroad"]
+            },
+            { 
+                ans: "absence", 
+                pre: "This is a reason for", 
+                suf: ".", 
+                cn_sent: "这就是缺席的原因。", 
+                vi_sent: "Đây chính là lý do cho sự vắng mặt.", 
+                word_cn: "absence: 缺席，不在场",
+                word_vi: "Sự vắng mặt. Thường dùng trong cụm 'in the absence of'.",
+                col: ["absence from", "leave of absence", "in the absence of"]
+            }
+        ];
+
+        let idx = 0; let isCorrect = false; let nextTimeout;
+        const input = document.getElementById('ansInput');
+
+        function speakFull() {
+            window.speechSynthesis.cancel();
+            const q = questions[idx];
+            const textToSpeak = `${q.pre} ${q.ans} ${q.suf}`;
+            const msg = new SpeechSynthesisUtterance(textToSpeak);
+            msg.lang = 'en-US';
+            msg.rate = 0.85; 
+            window.speechSynthesis.speak(msg);
+        }
+
+        function load() {
+            clearTimeout(nextTimeout); isCorrect = false;
+            document.getElementById('timerContainer').style.visibility = "hidden";
+            document.getElementById('timerBar').style.transition = "none";
+            document.getElementById('timerBar').style.width = "100%";
+            document.getElementById('expBox').classList.remove('show');
+            
+            const q = questions[idx];
+            document.getElementById('progress').innerText = `Day 1-30 | ${idx + 1}/${questions.length}`;
+            document.getElementById('cn-hint').innerText = q.cn_sent;
+            document.getElementById('vi-hint').innerText = q.vi_sent;
+            document.getElementById('prefix').innerText = q.pre;
+            document.getElementById('suffix').innerText = q.suf;
+            
+            input.value = ""; input.className = ""; input.disabled = false;
+            input.style.width = (q.ans.length * 18 + 40) + "px";
+            if (window.innerWidth > 768) input.focus();
+            
+            setTimeout(speakFull, 600); 
+        }
+
+        function handleCheck() {
+            if (isCorrect) { handleNext(); return; }
+            const q = questions[idx];
+            if (input.value.toLowerCase().trim() === q.ans.toLowerCase()) {
+                isCorrect = true;
+                input.classList.add('correct');
+                input.disabled = true;
+                
+                // Cập nhật hộp giải thích song ngữ
+                document.getElementById('expWordCn').innerText = q.word_cn;
+                document.getElementById('expWordVi').innerText = "Giải nghĩa: " + q.word_vi;
+                document.getElementById('expCol').innerHTML = q.col.map(c => `<span class="col-item">${c}</span>`).join('');
+                document.getElementById('expBox').classList.add('show');
+                
+                speakFull();
+                
+                document.getElementById('timerContainer').style.visibility = "visible";
+                setTimeout(() => {
+                    document.getElementById('timerBar').style.transition = "width 10s linear";
+                    document.getElementById('timerBar').style.width = "0%";
+                }, 50);
+                nextTimeout = setTimeout(handleNext, 10000);
+            } else {
+                input.style.borderBottomColor = "red";
+                setTimeout(() => input.style.borderBottomColor = "#bdc3c7", 500);
+            }
+        }
+
+        function handleSpeak() { speakFull(); }
+        function handlePrev() { if (idx > 0) { idx--; load(); } }
+        function handleNext() { idx = (idx + 1) % questions.length; load(); }
+        function handleHint() { input.value = questions[idx].ans; input.style.color = "var(--hint)"; speakFull(); }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleCheck();
+            if (e.key === 'ArrowLeft') handlePrev();
+            if (e.key === 'ArrowRight') handleNext();
+        });
+
+        window.addEventListener('click', () => {
+            if (document.getElementById('cn-hint').innerText.includes("点击")) load();
+        }, { once: true });
+    </script>
+</body>
+</html>
